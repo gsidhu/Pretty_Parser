@@ -1,0 +1,100 @@
+/* Pretty Parser */
+/* MIT License, 2014 Gurjot S. Sidhu */
+
+/* Pretty Parser style sheet */
+
+html {
+	background: #FFFFE0;
+	min-height:100%;
+	position:relative
+}
+
+body {
+	height: 100%;
+}
+
+.background {
+	background: #FFFFE0;
+/*	-webkit-border-radius: 10px;
+	border-radius: 10px;
+	-moz-border-radius: 10px 20px 30px 40px / 15px 30px 45px 60px;
+	position:relative;
+	top:0px;
+	bottom:0;
+	left:20%;
+	right:20%;
+	overflow:hidden;
+	z-index:-1 */
+}
+
+#topbar {
+/*	-webkit-border-radius: 10px;
+	border-radius: 10px;
+	-moz-border-radius: 10px 20px 30px 40px / 15px 30px 45px 60px;
+	height: 100px;
+	top:0;
+	bottom:0;
+	left: 20%;
+	right: 20%;
+	z-index:-1;*/
+	font-family: 'Bad Script', cursive;
+}
+
+#topbar h1 {
+	text-align: center;
+	vertical-align: middle;
+	line-height: 100px; 
+	margin-top: 10px;
+}
+
+#topbar h1 a:hover{
+	background:#4b67a1;
+}
+
+#topbar h5 {
+	text-align: center;
+	margin-top: -50px;
+}
+
+.item {
+	margin-left: 20%;
+	margin-right: 20%;
+	text-align: left;
+}
+
+.item #title {
+	font-family: 'News Cycle', sans-serif;
+	font-size: 14px;
+	font-style: underline;
+}
+
+.item #title a {
+	font-family: 'News Cycle', sans-serif;
+	font-size: 14px;
+	color: #000000;
+	font-style: underline;
+}
+
+.item #title a:hover {
+	font-family: 'News Cycle', sans-serif;
+	font-size: 14px;
+	color: #CC0000;
+	font-style: underline;
+}
+
+.item #pubdate {
+	font-family: helvetica,georgia,verdana,serif;
+	font-style: italic;
+	font-size: 10px;
+}
+
+.item #author {
+	font-family: helvetica,georgia,verdana,serif;
+	font-style: bold, italic;
+	font-size: 11px;
+}
+
+.item #description {
+	font-family: helvetica, georiga, verdana, serif;
+	font-size: 12px;
+}
