@@ -8,9 +8,8 @@ import random
 import re
 
 data = {}
-feeds = {'thehindu': 'http://www.thehindu.com/news/?service=rss',  'theguardian_football': 'http://feeds.theguardian.com/theguardian/uk/sport/rss', 'wired': 'http://feeds.wired.com/wired/index', 'sci_am': 'http://rss.sciam.com/sciam/physics', 'xkcd_whatif': 'http://what-if.xkcd.com/feed.atom', 'mashable': 'http://feeds.mashable.com/Mashable', 'cnet': 'http://www.cnet.com/rss/news/', 'aljazeera': 'http://america.aljazeera.com/content/ajam/articles.rss', 'cgpgrey': 'http://gdata.youtube.com/feeds/base/users/CGPGrey/uploads?alt=rss&orderby=published', 'kanangill': 'http://gdata.youtube.com/feeds/base/users/knngill/uploads?alt=rss&orderby=published',  'minutephysics': 'http://gdata.youtube.com/feeds/base/users/minutephysics/uploads?alt=rss&orderby=published', 'abishmathew': 'http://gdata.youtube.com/feeds/base/users/UCtWoDeegvTPfuuNm_ilJntg/uploads?alt=rss&orderby=published', 'lastweektonight': 'http://gdata.youtube.com/feeds/base/users/lastweektonight/uploads?alt=rss&orderby=published', 'jusreign': 'http://gdata.youtube.com/feeds/base/users/jusreign/uploads?alt=rss&orderby=published', 'alltime10s': 'http://gdata.youtube.com/feeds/base/users/Alltime10s/uploads?alt=rss&orderby=published', 'itsokaytobesmart': 'http://gdata.youtube.com/feeds/base/users/itsokaytobesmart/uploads?alt=rss&orderby=published', 'TED': 'http://gdata.youtube.com/feeds/base/users/tedtalksdirector/uploads?alt=rss&orderby=published', 'numberphile': 'http://gdata.youtube.com/feeds/base/users/numberphile/uploads?alt=rss&orderby=published', 'vsauce': 'http://gdata.youtube.com/feeds/base/users/vsauce/uploads?alt=rss&orderby=published', 'cokestudio': 'http://gdata.youtube.com/feeds/base/users/cokestudio/uploads?alt=rss&orderby=published', 'asapscience': 'http://gdata.youtube.com/feeds/base/users/AsapSCIENCE/uploads?alt=rss&orderby=published', 'AIB': 'http://gdata.youtube.com/feeds/base/users/UCzUYuC_9XdUUdrnyLii8WYg/uploads?alt=rss&orderby=published', 'smarter_every_day': 'http://gdata.youtube.com/feeds/base/users/destinws2/uploads?alt=rss&orderby=published'}
-feed_tags = ['cnet', 'sci_am', 'aljazeera', 'theguardian_football', 'thehindu', 'wired', 'mashable']
-youtube = ['alltime10s', 'AIB', 'abishmathew', 'asapscience', 'cgpgrey', 'cokestudio', 'itsokaytobesmart', 'jusreign', 'kanangill', 'lastweektonight', 'minutephysics', 'numberphile', 'TED', 'smarter_every_day', 'vsauce']
+feeds = {'thehindu': 'http://www.thehindu.com/news/?service=rss', 'theguardian_football': 'http://feeds.theguardian.com/theguardian/uk/sport/rss', 'wired': 'http://feeds.wired.com/wired/index', 'sci_am': 'http://rss.sciam.com/sciam/physics', 'xkcd_whatif': 'http://what-if.xkcd.com/feed.atom', 'mashable': 'http://feeds.mashable.com/Mashable', 'cnet': 'http://www.cnet.com/rss/news/', 'aljazeera': 'http://america.aljazeera.com/content/ajam/articles.rss', 'vox': 'http://www.vox.com/rss/index.xml', 'theguardian_world': 'http://www.theguardian.com/world/rss', 'empire_kop': 'http://www.empireofthekop.com/feed/', 'caravan': 'http://www.caravanmagazine.in/feed', 'new_yorker': 'http://www.newyorker.com/rss', 'brain_pickings': 'https://www.brainpickings.org/feed/'}
+feed_tags = ['cnet', 'sci_am', 'aljazeera', 'theguardian_football', 'thehindu', 'wired', 'mashable', 'vox', 'theguardian_world', 'empire_kop', 'caravan', 'new_yorker', 'brain_pickings']
 ##feeds = {}
 ##feed_tags = []
 ##while True:
@@ -25,9 +24,9 @@ def fetch():
     global data
     global feeds
     global feed_tags
-    global youtube
-    for tag in feed_tags+youtube:
-##        fetch = urr.urlretrieve(feeds[tag], tag + '.xml')
+    for tag in feed_tags:
+        print(tag)
+        urr.urlretrieve(feeds[tag], tag + '.xml')
         rss_file = open(tag+'.xml')
         soup = BS(rss_file, 'xml')
         local_data = []
@@ -42,9 +41,12 @@ def fetch():
             description = item.find('description')
             author = item.find('dc:creator')
             links = item.find('link')
-            
+            ## Note to self: item.find looks for tags within the item,
+            ## soup.find looks for global tags outside the items
             if pubdate == None:
                 pubdate = item.find('pubDate')
+            if pubdate == None:
+                pubdate = soup.find('lastBuildDate')
             if author == None:
                 author = soup.find('author')
             if author == None:
@@ -79,7 +81,6 @@ def pparser():
     global data
     global feeds
     global feed_tags
-    global youtube
     html_file = open('tmp.html', 'w+')    
     html_content = '''
     <!DOCTYPE html>
@@ -95,7 +96,7 @@ def pparser():
     </head>
     <body>
         <div id='topbar'>
-                <h1> Pretty Parser </h1>
+                <a href="https://github.com/gsidhu/Pretty_Parser"> <h1> Pretty Parser </h1></a>
                     <h5> Built with love and lots of chocolates </h5>
         </div>
     '''
@@ -105,9 +106,7 @@ def pparser():
     while num > 0:
         tag_choice = random.choice(feed_tags)
         while len(data[tag_choice]) < 2:
-            tag_choice = random.choice(feed_tags + youtube)
-        if num < 6:
-            tag_choice = random.choice(youtube)
+            tag_choice = random.choice(feed_tags)
         article_choice = random.randint(0,len(data[tag_choice])-1)
         
         content = '''
@@ -146,3 +145,5 @@ def pparser():
     again = input("More articles? ")
     if again == '':
         pparser()
+    elif again == 'n':
+        return 0
