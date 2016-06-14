@@ -19,4 +19,4 @@ Of course you can edit the `feeds` dictionary and the corresponding `feed_tags` 
 
 *Note to self: Someday I will turn this into a browser add-on. And maybe port to macOS if I feel like it.*
 
-**Special shoutout to the devs behind `cx_Freeze` for helping port this applet to Windows.**
+**Special shoutout to the devs behind cx_Freeze for helping port this applet to Windows.**

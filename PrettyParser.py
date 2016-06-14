@@ -1,24 +1,29 @@
 ## Pretty Parser 
-## MIT License, 2014 Gurjot S. Sidhu 
+## MIT License, 2016 Gurjot S. Sidhu 
 
 from bs4 import BeautifulSoup as BS
 import urllib.request as urr
 import webbrowser 
 import random
 import re
+import requests
 
 data = {}
 feeds = {'thehindu': 'http://www.thehindu.com/news/?service=rss', 'theguardian_football': 'http://feeds.theguardian.com/theguardian/uk/sport/rss', 'wired': 'http://feeds.wired.com/wired/index', 'sci_am': 'http://rss.sciam.com/sciam/physics', 'xkcd_whatif': 'http://what-if.xkcd.com/feed.atom', 'mashable': 'http://feeds.mashable.com/Mashable', 'cnet': 'http://www.cnet.com/rss/news/', 'aljazeera': 'http://america.aljazeera.com/content/ajam/articles.rss', 'vox': 'http://www.vox.com/rss/index.xml', 'theguardian_world': 'http://www.theguardian.com/world/rss', 'empire_kop': 'http://www.empireofthekop.com/feed/', 'caravan': 'http://www.caravanmagazine.in/feed', 'new_yorker': 'http://www.newyorker.com/rss', 'brain_pickings': 'https://www.brainpickings.org/feed/'}
-feed_tags = ['cnet', 'sci_am', 'aljazeera', 'theguardian_football', 'thehindu', 'wired', 'mashable', 'vox', 'theguardian_world', 'empire_kop', 'caravan', 'new_yorker', 'brain_pickings']
+feed_tags = ['cnet', 'sci_am', 'aljazeera', 'theguardian_football', 'thehindu', 'wired', 'mashable', 'vox', 'empire_kop', 'caravan', 'new_yorker','brain_pickings', 'theguardian_world']
+
 ##feeds = {}
 ##feed_tags = []
-##while True:
-##    link = input("RSS URL: ")
-##    if link == '':
-##        break
-##    tag = input("Tag for this feed: ")
-##    feeds[tag] = link
-##    feed_tags.append(tag)
+print("Yo. Welcome to Pretty Parser - the slickest, bare-bones RSS feed aggregator, ever.")
+print("You can add your own feeds in the next step.\nOr you can browse through my default feeds by simply pressing Enter in the next step.")
+print("Enjoy.\n")
+while True:
+    link = input("Input RSS URL: ")
+    if link == '':
+        break
+    tag = input("Input a name tag for this feed: ")
+    feeds[tag] = link
+    feed_tags.append(tag)
 
 def fetch():
     global data
@@ -26,8 +31,13 @@ def fetch():
     global feed_tags
     for tag in feed_tags:
         print(tag)
-        urr.urlretrieve(feeds[tag], tag + '.xml')
-        rss_file = open(tag+'.xml')
+        url_string = feeds[tag]
+        file_name = str(tag + '.xml')
+        with open(file_name, 'wb') as f:
+            resp = requests.get(url_string, verify=False)
+            f.write(resp.content)
+##        urr.urlretrieve(url_string, file_name)
+        rss_file = open(tag+'.xml', encoding="utf8")
         soup = BS(rss_file, 'xml')
         local_data = []
         #parsing xml item-wise
@@ -81,7 +91,7 @@ def pparser():
     global data
     global feeds
     global feed_tags
-    html_file = open('tmp.html', 'w+')    
+    html_file = open('tmp.html', 'w+', encoding="utf8")
     html_content = '''
     <!DOCTYPE html>
     <html>
@@ -145,11 +155,12 @@ def pparser():
 
     webbrowser.open('tmp.html')
 
-    again = input("More articles? ")
+    again = input("More articles? Press Enter for Hell Yeah or 'n' for Nuh-uh. : ").lower()
     if again == '':
         pparser()
     elif again == 'n':
         return 0
 
-fetch()
-pparser()
+if __name__ == "__main__":
+    fetch()
+    pparser()
