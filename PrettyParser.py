@@ -7,25 +7,37 @@ import webbrowser
 import random
 import re
 import requests
+import os
 
+home_dir = os.getcwd()
 data = {}
 feeds = {'thehindu': 'http://www.thehindu.com/news/?service=rss', 'theguardian_football': 'http://feeds.theguardian.com/theguardian/uk/sport/rss', 'wired': 'http://feeds.wired.com/wired/index', 'sci_am': 'http://rss.sciam.com/sciam/physics', 'xkcd_whatif': 'http://what-if.xkcd.com/feed.atom', 'mashable': 'http://feeds.mashable.com/Mashable', 'cnet': 'http://www.cnet.com/rss/news/', 'aljazeera': 'http://america.aljazeera.com/content/ajam/articles.rss', 'vox': 'http://www.vox.com/rss/index.xml', 'theguardian_world': 'http://www.theguardian.com/world/rss', 'empire_kop': 'http://www.empireofthekop.com/feed/', 'caravan': 'http://www.caravanmagazine.in/feed', 'new_yorker': 'http://www.newyorker.com/rss', 'brain_pickings': 'https://www.brainpickings.org/feed/'}
-feed_tags = ['cnet', 'sci_am', 'aljazeera', 'theguardian_football', 'thehindu', 'wired', 'mashable', 'vox', 'empire_kop', 'caravan', 'new_yorker','brain_pickings', 'theguardian_world']
+feed_tags = ['cnet', 'sci_am', 'aljazeera', 'theguardian_football', 'thehindu', 'wired', 'mashable', 'vox', 'empire_kop', 'caravan', 'new_yorker','brain_pickings']
+# 'theguardian_world'
 
-##feeds = {}
-##feed_tags = []
-print("Yo. Welcome to Pretty Parser - the slickest, bare-bones RSS feed aggregator, ever.")
-print("You can add your own feeds in the next step.\nOr you can browse through my default feeds by simply pressing Enter in the next step.")
+print("Yo. Welcome to Pretty Parser - the slickest, bare-bones RSS feed aggregator, ever.\n")
+print("Do you want browse through my default feeds? Warning: Contains a Liverpool FC fan page.")
+stick2def = input("Press Enter for Yaas or 'N' for Nooo: ").lower()
+
+if stick2def == 'n':
+    feeds = {}
+    feed_tags = []
+    print("\nAll right. You can add your own RSS links in the next step. Press Enter when you're done.\n")
+    while True:
+        link = input("Input RSS URL: ")
+        if link == '':
+            break
+        tag = input("Input a name tag for this feed: ")
+        feeds[tag] = link
+        feed_tags.append(tag)
+
 print("Enjoy.\n")
-while True:
-    link = input("Input RSS URL: ")
-    if link == '':
-        break
-    tag = input("Input a name tag for this feed: ")
-    feeds[tag] = link
-    feed_tags.append(tag)
-
 def fetch():
+    newpath = str(home_dir + '/XML_storage')
+    if not os.path.exists(newpath):
+        os.makedirs(newpath)
+    os.chdir(newpath)
+    
     global data
     global feeds
     global feed_tags
@@ -88,6 +100,7 @@ no_rep = True
 ##        no_rep = False 
 
 def pparser():
+    os.chdir(home_dir)
     global data
     global feeds
     global feed_tags
@@ -155,7 +168,7 @@ def pparser():
 
     webbrowser.open('tmp.html')
 
-    again = input("More articles? Press Enter for Hell Yeah or 'n' for Nuh-uh. : ").lower()
+    again = input("More articles? Press Enter for Hell Yeah or any other key for Nuh-uh. : ").lower()
     if again == '':
         pparser()
     elif again == 'n':
