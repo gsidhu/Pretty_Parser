@@ -9,7 +9,7 @@ Download the `Pretty Parser for Windows` directory. Run `PrettyParser.exe`. Enjo
 ## UNIX
 You'll need Python 3.x installed on your system along with the `Beautiful Soup` and `Requests` modules (and probably `LXML` as well if you're not on Linux).
 
-### How it works
+#### How it works
 1. The `fetch()` function downloads the XML files from the website's server.
 2. The `pparser()` function assembles 25 random articles from all the sources and displays them in your system's default browser.
 3. The `style.css` file is to make things look Pretty.

@@ -11,12 +11,13 @@ import os
 
 home_dir = os.getcwd()
 data = {}
-feeds = {'thehindu': 'http://www.thehindu.com/news/?service=rss', 'theguardian_football': 'http://feeds.theguardian.com/theguardian/uk/sport/rss', 'wired': 'http://feeds.wired.com/wired/index', 'sci_am': 'http://rss.sciam.com/sciam/physics', 'xkcd_whatif': 'http://what-if.xkcd.com/feed.atom', 'mashable': 'http://feeds.mashable.com/Mashable', 'cnet': 'http://www.cnet.com/rss/news/', 'aljazeera': 'http://america.aljazeera.com/content/ajam/articles.rss', 'vox': 'http://www.vox.com/rss/index.xml', 'theguardian_world': 'http://www.theguardian.com/world/rss', 'empire_kop': 'http://www.empireofthekop.com/feed/', 'caravan': 'http://www.caravanmagazine.in/feed', 'new_yorker': 'http://www.newyorker.com/rss', 'brain_pickings': 'https://www.brainpickings.org/feed/'}
-feed_tags = ['cnet', 'sci_am', 'aljazeera', 'theguardian_football', 'thehindu', 'wired', 'mashable', 'vox', 'empire_kop', 'caravan', 'new_yorker','brain_pickings']
+feeds = {'thehindu': 'http://www.thehindu.com/news/?service=rss', 'theguardian_football': 'http://feeds.theguardian.com/theguardian/uk/sport/rss', 'wired': 'http://feeds.wired.com/wired/index', 'sci_am': 'http://rss.sciam.com/sciam/physics', 'xkcd_whatif': 'http://what-if.xkcd.com/feed.atom', 'mashable': 'http://feeds.mashable.com/Mashable', 'cnet': 'http://www.cnet.com/rss/news/', 'aljazeera': 'http://america.aljazeera.com/content/ajam/articles.rss', 'vox': 'http://www.vox.com/rss/index.xml', 'theguardian_world': 'http://www.theguardian.com/world/rss', 'empire_kop': 'http://www.empireofthekop.com/feed/', 'caravan': 'http://www.caravanmagazine.in/feed', 'new_yorker': 'http://www.newyorker.com/rss', 'newyork_times': 'http://rss.nytimes.com/services/xml/rss/nyt/InternationalHome.xml', 'brain_pickings': 'https://www.brainpickings.org/feed/'}
+feed_tags = ['cnet', 'sci_am', 'aljazeera', 'theguardian_football', 'thehindu', 'wired', 'mashable', 'vox', 'empire_kop', 'caravan', 'new_yorker','newyork_times','brain_pickings']
 # 'theguardian_world'
+local_feed_tags = []
 
-print("Yo. Welcome to Pretty Parser - the slickest, bare-bones RSS feed aggregator, ever.\n")
-print("Do you want browse through my default feeds? Warning: Contains a Liverpool FC fan page.")
+print("Yo, whaddup?\nWelcome to Pretty Parser - the slickest, bare-bones RSS feed aggregator, ever.\n")
+print("Do you want browse through my default feeds? \nWarning: Contains a Liverpool FC fan page.")
 stick2def = input("Press Enter for Yaas or 'N' for Nooo: ").lower()
 
 if stick2def == 'n':
@@ -29,27 +30,47 @@ if stick2def == 'n':
             break
         tag = input("Input a name tag for this feed: ")
         feeds[tag] = link
-        feed_tags.append(tag)
+#        feed_tags.append(tag)
 
-print("Enjoy.\n")
 def fetch():
     newpath = str(home_dir + '/XML_storage')
     if not os.path.exists(newpath):
         os.makedirs(newpath)
     os.chdir(newpath)
     
-    global data
     global feeds
     global feed_tags
+
+    print("\nFetching data from sources.")
     for tag in feed_tags:
-        print(tag)
         url_string = feeds[tag]
-        file_name = str(tag + '.xml')
+        file_name = str(tag+".xml")
         with open(file_name, 'wb') as f:
             resp = requests.get(url_string, verify=False)
             f.write(resp.content)
 ##        urr.urlretrieve(url_string, file_name)
-        rss_file = open(tag+'.xml', encoding="utf8")
+            
+def populate():
+    newpath = str(home_dir + '/XML_storage')
+    if os.path.exists(newpath):
+        os.chdir(newpath)
+    else:
+        raise OSError("XML data not found.")
+    
+    global data
+    global feeds
+    global local_feed_tags
+    
+    xml_files = os.listdir(".")
+    for names in xml_files:
+        if names.endswith(".xml"):
+            local_feed_tags.append(names)
+
+    print("\nGenerating feed from the following sources:")
+    for name in local_feed_tags:
+        tag = name[:-4]
+        print(tag)
+        rss_file = open(name, encoding="utf8")
         soup = BS(rss_file, 'xml')
         local_data = []
         #parsing xml item-wise
@@ -94,7 +115,7 @@ def fetch():
                 break
         data[tag] = (local_data)
         rss_file.close()
-
+    print("\nEnjoy.")
 no_rep = True
 ##    if input("Do you want the articles to repeat after you've viewed them once? (Y/N) ") == "Y":
 ##        no_rep = False 
@@ -103,7 +124,7 @@ def pparser():
     os.chdir(home_dir)
     global data
     global feeds
-    global feed_tags
+    global local_feed_tags
     html_file = open('tmp.html', 'w+', encoding="utf8")
     html_content = '''
     <!DOCTYPE html>
@@ -113,22 +134,23 @@ def pparser():
     </title>
     <head>
             <meta charset="utf-8"> 
-            <link href='https://fonts.googleapis.com/css?family=Overlock' rel='stylesheet' type='text/css'>
             <link href='https://fonts.googleapis.com/css?family=Bad+Script' rel='stylesheet' type='text/css'>
+            <link href='https://fonts.googleapis.com/css?family=Economica:700' rel='stylesheet' type='text/css'>
+            <link href='https://fonts.googleapis.com/css?family=PT+Serif' rel='stylesheet' type='text/css'>
             <link rel="stylesheet" type="text/css" href="style.css" />
     </head>
     <body>
         <div id='topbar'>
-                <a href="https://github.com/gsidhu/Pretty_Parser"> <h1> Pretty Parser </h1></a>
+                <h1><a href="https://github.com/gsidhu/Pretty_Parser">  Pretty Parser </a></h1>
         </div>
     '''
 
     num = 25
 
     while num > 0:
-        tag_choice = random.choice(feed_tags)
+        tag_choice = random.choice(local_feed_tags)[:-4]
         while len(data[tag_choice]) < 2:
-            tag_choice = random.choice(feed_tags)
+            tag_choice = random.choice(local_feed_tags)[:-4]
         article_choice = random.randint(0,len(data[tag_choice])-1)
         
         content = '''
@@ -146,6 +168,7 @@ def pparser():
                             <p>''' + data[tag_choice][article_choice]["description"] + '''</p>
                     </span>
         </div>
+        <hr>
         '''
         html_content += content
         content = ''
@@ -156,8 +179,9 @@ def pparser():
 
     html_content += '''
     <footer class="footer">
-	<hr>
-	<h4> &copy; 2016. Some rights reserved. Built with &#9829; and lots of chocolate. </h4>
+        <h3><a href="https://gsidhu.github.io">  That Gurjot </a></h3>
+        <h4><a href="https://github.com/gsidhu/Pretty_Parser">  Source </a></h4>
+        <p> &copy; 2016. Some rights reserved. Built with &#9829; and lots of chocolate. </p>
 	</footer>
     </body>
     </html>
@@ -175,5 +199,13 @@ def pparser():
         return 0
 
 if __name__ == "__main__":
-    fetch()
-    pparser()
+    newpath = str(home_dir + '/XML_storage')
+    if os.path.exists(newpath):
+        if input("\nThe force senses some old XML data files.\nDo you want to generate a feed from this old data?\nEnter is yes, any other key is no: ") != '':
+            fetch()
+        populate()
+        pparser()
+    else:
+        fetch()
+        populate()
+        pparser()
