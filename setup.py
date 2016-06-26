@@ -11,7 +11,7 @@ base = None
 ##    base = "Win32GUI"
 
 setup(  name = "Pretty Parser",
-        version = "1.1",
+        version = "1.2",
         description = "Bare-minimum RSS Feed Aggregator",
         options = {"build_exe": build_exe_options},
         executables = [Executable("PrettyParser.py", base=base)])
