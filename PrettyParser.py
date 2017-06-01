@@ -1,14 +1,19 @@
-## Pretty Parser 
-## MIT License, 2016 Gurjot S. Sidhu 
+# -*- coding: utf-8 -*-
+
+## Pretty Parser
+## MIT License, 2016 Gurjot S. Sidhu
+## Python 3
 
 from bs4 import BeautifulSoup as BS
 #import urllib.request as urr
-import webbrowser 
+import webbrowser
 import random
 import re
 import requests
 import os
-import datetime 
+import datetime
+#from newspaper import Article
+from goose import Goose
 
 home_dir = os.getcwd()
 data = {}
@@ -38,7 +43,7 @@ def fetch():
     if not os.path.exists(newpath):
         os.makedirs(newpath)
     os.chdir(newpath)
-    
+
     global feeds
     global feed_tags
 
@@ -50,18 +55,18 @@ def fetch():
             resp = requests.get(url_string, verify=False)
             f.write(resp.content)
 ##        urr.urlretrieve(url_string, file_name)
-            
+
 def populate():
     newpath = str(home_dir + '/XML_storage')
     if os.path.exists(newpath):
         os.chdir(newpath)
     else:
         raise OSError("XML data not found.")
-    
+
     global data
     global feeds
     global local_feed_tags
-    
+
     xml_files = os.listdir(".")
     for names in xml_files:
         if names.endswith(".xml"):
@@ -108,7 +113,7 @@ def populate():
                 description = p.sub('',description)
                 if len(description) > 300:
                     description = description[:300] + " ..."
-            
+
             if type(description) != str:
                 description = description.text
             local_data.append({"title": title.text, "pubdate":pubdate.text,"author":author.text,"description":description,"link":links.text})
@@ -121,12 +126,62 @@ def user_queries():
     how_old = input("\nHow old would you like your news to be? (Input 0 for today's news): ")
     no_rep = True
     if input("Do you want the articles to repeat after you've viewed them once? (Y/N) ").lower() == "Y":
-        no_rep = False 
+        no_rep = False
     num = input("How many articles do you want to see per page? Press Enter to use default (25): ")
     if num == '':
         num = 25
     num = int(num)
     return how_old,num,no_rep
+
+def create_article_html(article, counter, article_url):
+    '''
+    Takes an article object from newspaper and creates an html webpage out of it.
+    '''
+#    article.download()
+#    article.parse()
+#    text_paras = article.text.split('\n')
+    article_text = article.cleaned_text
+    text_paras = article_text.split("\n")
+
+    html_content = '''
+    <!DOCTYPE html>
+    <html>
+    <title>
+        Pretty Parser
+    </title>
+    <head>
+            <meta charset="utf-8">
+            <link href='https://fonts.googleapis.com/css?family=Bad+Script' rel='stylesheet' type='text/css'>
+            <link href='https://fonts.googleapis.com/css?family=Economica:700' rel='stylesheet' type='text/css'>
+            <link href='https://fonts.googleapis.com/css?family=PT+Serif' rel='stylesheet' type='text/css'>
+            <link rel="stylesheet" type="text/css" href="style.css" />
+    </head>
+    <body>
+        <div id='topbar'>
+                <h1><a href="https://github.com/gsidhu/Pretty_Parser">  Pretty Parser </a></h1>
+        </div>
+        <div class='item'>
+            <h2><a href='''+ str(article_url)+'''>'''+ article.title +'''</a></h2>
+            <p>'''
+
+    for i in range(len(text_paras)):
+        html_content += str("<p>" +text_paras[i]+"</p>")
+
+    html_content += '''
+    </div>
+    <hr>
+    </body>
+    <footer class="footer">
+        <h3><a href="https://gsidhu.github.io">  That Gurjot </a></h3>
+        <h4><a href="https://github.com/gsidhu/Pretty_Parser">  Source </a></h4>
+        <p> &copy; 2016. Some rights reserved. Built with &#9829; and lots of chocolate. </p>
+	</footer>
+    </body>
+    </html>
+    '''
+    article_html_file = open(str('tmp_article_'+str(counter)+'.html'), 'w+', encoding="utf8")
+    article_html_file.write(html_content)
+    article_html_file.close()
 
 def pparser(how_old,num,no_rep):
     os.chdir(home_dir)
@@ -141,7 +196,7 @@ def pparser(how_old,num,no_rep):
         Pretty Parser
     </title>
     <head>
-            <meta charset="utf-8"> 
+            <meta charset="utf-8">
             <link href='https://fonts.googleapis.com/css?family=Bad+Script' rel='stylesheet' type='text/css'>
             <link href='https://fonts.googleapis.com/css?family=Economica:700' rel='stylesheet' type='text/css'>
             <link href='https://fonts.googleapis.com/css?family=PT+Serif' rel='stylesheet' type='text/css'>
@@ -149,7 +204,7 @@ def pparser(how_old,num,no_rep):
     </head>
     <body>
         <div id='topbar'>
-                <h1><a href="https://github.com/gsidhu/Pretty_Parser">  Pretty Parser </a></h1>
+            <h1><a href="https://github.com/gsidhu/Pretty_Parser">  Pretty Parser </a></h1>
         </div>
     '''
     counter = num
@@ -166,12 +221,17 @@ def pparser(how_old,num,no_rep):
             except:
                 article_date = datetime.datetime.strptime(data[tag_choice][article_choice]["pubdate"], '%a, %d %b %Y %H:%M:%S %Z').date()
 
+        article_url = data[tag_choice][article_choice]["link"]
+#        article = Article(article_url)
+        article = g.extract(article_url)
+        create_article_html(article, counter, article_url)
+
         content = '''
             <div class='item'>
                     <span id = 'title'>
-                            <h2> ''' + str(str(num+1-counter)+". ") + ''' <a href= "''' + data[tag_choice][article_choice]["link"] + '''" target="_blank">''' + data[tag_choice][article_choice]["title"] + '''</a></h2>
+                            <h2> ''' + str(str(num+1-counter)+". ") + ''' <a href= "''' + str('tmp_article_'+str(counter)+'.html') + '''" target="_blank">''' + data[tag_choice][article_choice]["title"] + '''</a></h2>
                     </span>
-                    <span id ='pubdate'> 
+                    <span id ='pubdate'>
                             <h5>''' + data[tag_choice][article_choice]["pubdate"] + '''</h5>
                     </span>
                     <span id ='author'>

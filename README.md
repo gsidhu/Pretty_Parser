@@ -33,3 +33,8 @@ Listed newest first -
 
 ### Known Issues
 * The Windows applet quits automatically after fetching sources. Works fine if you run it again.
+
+##TO DO
+* Implement the newspaper module for Python 3.x.
+* Create a Python 2.x implementation.
+* Perhaps use the python-goose module for better speed.
